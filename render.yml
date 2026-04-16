@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: snake-and-ladder-backend
+    env: java
+    buildCommand: chmod +x mvnw && ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    plan: free
