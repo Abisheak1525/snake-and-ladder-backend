@@ -35,33 +35,37 @@ public class GameController {
     }
 
     @GetMapping("/Roll-Dice")
-    public String rollDie() {
+    public Map<String, Object> rollDie() {
 
         Random random = new Random();
         int dice = random.nextInt(6) + 1;
 
+        String event = "normal";
         int newPosition = playerPosition + dice;
 
         if (newPosition > 100) {
-            return "Dice: " + dice + " | Can't move, retry!";
+            event = "retry";
+        } else {
+            playerPosition = newPosition;
+
+            if (ladder.containsKey(playerPosition)) {
+                playerPosition = ladder.get(playerPosition);
+                event = "ladder";
+            } else if (snake.containsKey(playerPosition)) {
+                playerPosition = snake.get(playerPosition);
+                event = "snake";
+            }
+
+            if (playerPosition == 100) {
+                event = "win";
+            }
         }
 
-        playerPosition = newPosition;
-
-        if (ladder.containsKey(playerPosition)) {
-            playerPosition = ladder.get(playerPosition);
-            return "Dice: " + dice + " | Ladder! New Position: " + playerPosition;
-        }
-
-        if (snake.containsKey(playerPosition)) {
-            playerPosition = snake.get(playerPosition);
-            return "Dice: " + dice + " | Snake! New Position: " + playerPosition;
-        }
-
-        if (playerPosition == 100) {
-            return "🎉 You WON!";
-        }
-
-        return "Dice: " + dice + " | Position: " + playerPosition;
+        return Map.of(
+            "player", 1,
+            "dice", dice,
+            "position", playerPosition,
+            "event", event
+        );
     }
 }
